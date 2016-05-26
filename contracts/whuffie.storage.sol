@@ -29,10 +29,9 @@ contract WhuffieStorage is named("WhuffieStorage") {
     
     address targetAddr;         /**< address of Ledger target */
     uint limit;                 /**< maximum target credit to hold */
+    uint[2] exchangeRate;       /**< exchange rate between target's and source's credit */
     uint sourceBalance;         /**< balance of source's credit */
     uint targetBalance;         /**< balance of target's credit */
-    uint24 exchangeRate;        /**< exchange rate between target's and source's credit */
-    uint24 fee;                 /**< additional charge when accepting target's credit */
     uint lockedSourceBalance;   /**< immovable balance of source's credit */
     uint lockedTargetBalance;   /**< immovable balance of target's credit */
   }
@@ -78,21 +77,11 @@ contract WhuffieStorage is named("WhuffieStorage") {
   function getExchangeRate(
     address source,
     address target
-  ) public constant returns (uint16 exchangeRate) {}
+  ) public constant returns (uint[2] exchangeRate) {}
   function setExchangeRate(
     address source,
     address target,
-    uint rate
-  ) public returns (bool success) {}
-  
-  function getFee(
-    address source,
-    address target
-  ) public constant returns (uint16 fee) {}
-  function setFee(
-    address source,
-    address target
-    uint fee
+    uint[2] rate
   ) public returns (bool success) {}
   
   function getLockedSourceBalance(
@@ -125,9 +114,8 @@ contract WhuffieStorage is named("WhuffieStorage") {
     uint size;            /**< length of the linked-list */
     address head;         /**< pointer to the first Ledger of linked-list */
     address tail;         /**< pointer to the last Ledger of linked-list */
-    
-    mapping (             /**< hashmap of Ledgers by target address */
-      address => Ledger
+    mapping (
+      address => Ledger   /**< hashmap of Ledgers by target address */
     ) ledgers;
   }
   
@@ -152,7 +140,7 @@ contract WhuffieStorage is named("WhuffieStorage") {
   ) public returns () {}
   
   // public iterators
-    // would be more complicated if using a linked list instead of array for storage
+    // TODO: add remaining linked list iterators
   function iter_getLedgerMapLength(
     address source,
     address target
@@ -168,10 +156,10 @@ contract WhuffieStorage is named("WhuffieStorage") {
    * @notice A Whuffie-holding account
    ***********************************************************/
   struct User {
-    bool exists;        /**< whether or not the User exists */
-    address sourceAddr; /**< the User's address */
-    bytes metadata;     /**< metadata regarding the User's last transaction */
-    LedgerMap ledgers;  /**< a collection of the User's open ledgers */
+    bool exists;          /**< whether or not the User exists */
+    address sourceAddr;   /**< the User's address */
+    bytes metadata;       /**< metadata regarding the User's last transaction */
+    LedgerMap ledgers;    /**< a collection of the User's open ledgers */
   }
   
   // internal helpers
@@ -196,7 +184,6 @@ contract WhuffieStorage is named("WhuffieStorage") {
     uint size;            /**< length of the linked-list */
     address head;         /**< pointer to the first User of linked-list */
     address tail;         /**< pointer to the last User of linked-list */
-    
     mapping (
       address => User     /**< hashmap of Users by their address */
     ) users;
@@ -220,7 +207,7 @@ contract WhuffieStorage is named("WhuffieStorage") {
   ) public returns () {}
   
   // public iterators
-     // would be more complicated if using a linked list instead of array for storage
+    // TODO: add remaining linked list iterators
   function iter_getUserMapLength() public constant returns () {}
   function iter_getUserByIndex(uint index) public constant returns () {}
   
@@ -230,7 +217,7 @@ contract WhuffieStorage is named("WhuffieStorage") {
   UserMap public Graph;
   
   // everytime a new API contract is deployed, it should be added to this list
-  mapping (address => bool) APIs;
+  mapping (address => bool) APIAccess;
   
   // get a user
     // var user = Users.get(addr)
